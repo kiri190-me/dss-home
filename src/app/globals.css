@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/*
+ * 회사 색.
+ *
+ * --dss-blue / --dss-red 는 로고의 색이다(scripts로 아이콘을 그리는
+ * dss-auth와 같은 값). --dss-accent 는 기존 dss21.com이 본문 강조에 쓰던
+ * 색으로, 사이트 CSS에서 가장 많이 쓰인 유채색을 그대로 가져왔다.
+ * --dss-navy 는 메인 배너의 짙은 남색이다.
+ */
+:root {
+  --dss-blue: #0000cc;
+  --dss-red: #ee0000;
+  --dss-accent: #2da5c7;
+  --dss-navy: #0a1a3f;
+  --dss-navy-2: #0d2b5c;
+}
+
+@theme inline {
+  --color-dss-blue: var(--dss-blue);
+  --color-dss-red: var(--dss-red);
+  --color-dss-accent: var(--dss-accent);
+  --color-dss-navy: var(--dss-navy);
+  --color-dss-navy-2: var(--dss-navy-2);
+  --font-sans:
+    "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic",
+    "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+/*
+ * 다크 모드를 두지 않는다.
+ *
+ * dss-auth는 다크 모드를 따라가지만 이쪽은 밝은 화면 하나로 고정한다.
+ * 회사 소개 사이트는 인쇄물·명함·전시회 부스와 같은 얼굴이어야 하고,
+ * 보는 사람의 OS 설정에 따라 색이 달라지면 그 일관성이 깨진다. 원본
+ * dss21.com도 밝은 화면 하나뿐이다.
+ *
+ * 그래서 배경과 글자색을 명시한다 — 비워 두면 브라우저가 OS 설정을 따라
+ * 칠해 흰 바탕을 전제로 만든 화면이 어긋난다.
+ */
+html {
+  color-scheme: light;
+}
+
+body {
+  background: #ffffff;
+  color: #1f2937;
+  font-family: var(--font-sans);
+  /* 모바일 가로 스크롤을 막는다 — 배너의 넓은 도형이 넘칠 수 있다. */
+  overflow-x: hidden;
+}
