@@ -1,0 +1,38 @@
+# dss-home 전용 PostgreSQL (개발용).
+#
+# ⚠️ 반드시 `npm run db:up`으로 띄우세요.
+#   docker compose는 .env만 자동으로 읽고 .env.local은 읽지 않습니다. 그냥
+#   `docker compose up`을 하면 POSTGRES_PASSWORD가 빈 값이 되어 컨테이너가
+#   재시작 루프에 빠집니다. db:up 스크립트가 --env-file .env.local을 붙입니다.
+#   (dss-auth에서 실제로 겪은 함정이라 같은 장치를 둡니다.)
+#
+# 포트가 5436인 이유: 이 개발 PC에서 A/S 관리 시스템이 5432(dev)·5433(staging),
+# dss-auth가 5434를 이미 쓴다. 세 프로젝트를 동시에 띄워야 의뢰 → 당겨오기 →
+# 접수 왕복을 확인할 수 있으므로 겹치면 안 된다.
+#
+# ⚠️ 이 DB는 개발용일 뿐이다. 운영에서 이 표들은 **회사 밖 호스팅**의
+#    관리형 Postgres에 있게 된다(사내 NAS가 아니다).
+#
+# 127.0.0.1에만 바인딩한다 — 개발 PC 밖에서는 직접 접속할 수 없다.
+services:
+  db-dev:
+    image: postgres:16.14-alpine3.24
+    container_name: dss-home-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dss_home_app
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD}
+      POSTGRES_DB: dss_home_dev
+    ports:
+      - "127.0.0.1:5436:5432"
+    volumes:
+      - dss-home-postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dss_home_app -d dss_home_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  dss-home-postgres-dev-data:
+    name: dss-home-postgres-dev-data

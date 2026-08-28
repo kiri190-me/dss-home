@@ -37,6 +37,53 @@ export function portalUrl(): string {
 }
 
 /**
+ * 사내(A/S 시스템)에서 오는 요청임을 증명하는 공유 비밀.
+ *
+ * 이 값 하나로 새 수리 의뢰를 읽고 고객사 링크를 심을 수 있다. 다만 **이
+ * 키로 사내망에 닿을 수는 없다** — 연결은 언제나 사내가 먼저 걸고, 여기서
+ * 사내로 가는 길은 없다.
+ *
+ * dss-auth의 OIDC를 거치지 않는다. 그쪽은 사람이 브라우저로 사내 시스템에
+ * 들어가는 통로이고, 이건 서버 둘이 주고받는 다른 종류의 신뢰다. 방식
+ * (해시 저장·시간차 없는 비교)은 본뜨되 시스템을 끌어오지는 않는다.
+ *
+ * 없으면 조용히 열어두지 않고 멈춘다 — 인증이 빠졌는데 그럭저럭 도는 상태가
+ * 가장 위험하다(dss-auth `config/env.ts`와 같은 판단).
+ */
+export function nasSyncSecret(): string {
+  const value = process.env.NAS_SYNC_SECRET;
+  if (!value || value.length < 32) {
+    throw new Error(
+      "NAS_SYNC_SECRET이 없거나 너무 짧습니다(32자 이상). .env.local을 확인하세요."
+    );
+  }
+  return value;
+}
+
+/**
+ * 우리 앞에 있는 **신뢰하는** 리버스 프록시 수. 기본 0.
+ *
+ * 속도 제한이 손님을 구분하는 근거다. 자세한 판단은 lib/http/client-key.ts에
+ * 있다 — 요약하면 x-forwarded-for의 앞자리는 클라이언트가 쓴 값이라 위조
+ * 가능하고 프록시가 덧붙인 뒷자리만 믿을 수 있다.
+ *
+ * ⚠️ 이 사이트는 **외부 호스팅에 올라가고 대부분의 호스팅은 프록시 뒤**라,
+ * 배포할 때 1로 바꿔야 할 가능성이 높다. 0으로 두면 뚫리지는 않고 대신
+ * 모두가 한 통을 쓴다 — 틀렸을 때 안전한 쪽으로 기울인 기본값이다.
+ */
+export function trustedProxyHops(): number {
+  const raw = process.env.TRUSTED_PROXY_HOPS;
+  if (raw === undefined || raw === "") return 0;
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(
+      `TRUSTED_PROXY_HOPS는 0 이상의 정수여야 합니다(받은 값: ${raw}).`
+    );
+  }
+  return parsed;
+}
+
+/**
  * 대메뉴. 기존 사이트의 6개 대분류와 그 하위 항목을 그대로 옮겼다.
  *
  * href가 전부 "#"인 이유: 이번 작업의 범위는 메인 한 장이고 하위 페이지는

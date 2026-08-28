@@ -1,0 +1,2 @@
+DROP INDEX "customer_repair_items_source_unique";--> statement-breakpoint
+CREATE UNIQUE INDEX "customer_repair_items_link_source_unique" ON "customer_repair_items" USING btree ("customer_link_id","source_kind","source_id");

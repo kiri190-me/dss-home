@@ -1,0 +1,639 @@
+{
+  "id": "3b8d60a8-b8eb-4b2d-8e17-41361a8dd5ff",
+  "prevId": "f13520fe-b5df-46d9-a0cb-ba60401576aa",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.customer_links": {
+      "name": "customer_links",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nas_link_id": {
+          "name": "nas_link_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_display_name": {
+          "name": "customer_display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_revoked": {
+          "name": "is_revoked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "customer_links_nas_link_id_idx": {
+          "name": "customer_links_nas_link_id_idx",
+          "columns": [
+            {
+              "expression": "nas_link_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "customer_links_nas_link_id_unique": {
+          "name": "customer_links_nas_link_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nas_link_id"
+          ]
+        },
+        "customer_links_token_hash_unique": {
+          "name": "customer_links_token_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.repair_requests": {
+      "name": "repair_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "customer_link_id": {
+          "name": "customer_link_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "form_kind": {
+          "name": "form_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'RF'"
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_name": {
+          "name": "contact_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_phone": {
+          "name": "contact_phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_email": {
+          "name": "contact_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "product_model_name": {
+          "name": "product_model_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lot_number": {
+          "name": "lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "serial_number": {
+          "name": "serial_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_user": {
+          "name": "end_user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "return_address": {
+          "name": "return_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chamber_info": {
+          "name": "chamber_info",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc1_generator_lot_number": {
+          "name": "pc1_generator_lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc1_generator_model": {
+          "name": "pc1_generator_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc1_matcher_lot_number": {
+          "name": "pc1_matcher_lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc1_matcher_model": {
+          "name": "pc1_matcher_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc2_generator_lot_number": {
+          "name": "pc2_generator_lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc2_generator_model": {
+          "name": "pc2_generator_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc2_matcher_lot_number": {
+          "name": "pc2_matcher_lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc2_matcher_model": {
+          "name": "pc2_matcher_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc3_generator_lot_number": {
+          "name": "pc3_generator_lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc3_generator_model": {
+          "name": "pc3_generator_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc3_matcher_lot_number": {
+          "name": "pc3_matcher_lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pc3_matcher_model": {
+          "name": "pc3_matcher_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alarm_name": {
+          "name": "alarm_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "symptom_description": {
+          "name": "symptom_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "process_source_power": {
+          "name": "process_source_power",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "process_bias_power": {
+          "name": "process_bias_power",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_power": {
+          "name": "issue_power",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "normal_position": {
+          "name": "normal_position",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_position": {
+          "name": "issue_position",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_actions": {
+          "name": "customer_actions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_process_scope": {
+          "name": "issue_process_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_intermittency": {
+          "name": "issue_intermittency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_timing": {
+          "name": "issue_timing",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_process_condition": {
+          "name": "issue_process_condition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chamber_counts": {
+          "name": "chamber_counts",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "customer_inspection_detail": {
+          "name": "customer_inspection_detail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "submitted_at": {
+          "name": "submitted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "submitter_ip_hash": {
+          "name": "submitter_ip_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pulled_at": {
+          "name": "pulled_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "repair_requests_unpulled_idx": {
+          "name": "repair_requests_unpulled_idx",
+          "columns": [
+            {
+              "expression": "submitted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "pulled_at IS NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "repair_requests_customer_link_id_idx": {
+          "name": "repair_requests_customer_link_id_idx",
+          "columns": [
+            {
+              "expression": "customer_link_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "repair_requests_customer_link_id_customer_links_id_fk": {
+          "name": "repair_requests_customer_link_id_customer_links_id_fk",
+          "tableFrom": "repair_requests",
+          "tableTo": "customer_links",
+          "columnsFrom": [
+            "customer_link_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "repair_requests_form_kind_check": {
+          "name": "repair_requests_form_kind_check",
+          "value": "\"repair_requests\".\"form_kind\" IN ('RF')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.customer_repair_items": {
+      "name": "customer_repair_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "customer_link_id": {
+          "name": "customer_link_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_kind": {
+          "name": "source_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "intake_number": {
+          "name": "intake_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_name": {
+          "name": "model_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lot_number": {
+          "name": "lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "serial_number": {
+          "name": "serial_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "received_at": {
+          "name": "received_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status_label": {
+          "name": "status_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status_note": {
+          "name": "status_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quote_number": {
+          "name": "quote_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quote_issued_date": {
+          "name": "quote_issued_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "customer_repair_items_link_source_unique": {
+          "name": "customer_repair_items_link_source_unique",
+          "columns": [
+            {
+              "expression": "customer_link_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_kind",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "customer_repair_items_link_received_idx": {
+          "name": "customer_repair_items_link_received_idx",
+          "columns": [
+            {
+              "expression": "customer_link_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "received_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "customer_repair_items_model_lower_idx": {
+          "name": "customer_repair_items_model_lower_idx",
+          "columns": [
+            {
+              "expression": "lower(model_name)",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "customer_repair_items_lot_lower_idx": {
+          "name": "customer_repair_items_lot_lower_idx",
+          "columns": [
+            {
+              "expression": "lower(lot_number)",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "customer_repair_items_serial_lower_idx": {
+          "name": "customer_repair_items_serial_lower_idx",
+          "columns": [
+            {
+              "expression": "lower(serial_number)",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "customer_repair_items_customer_link_id_customer_links_id_fk": {
+          "name": "customer_repair_items_customer_link_id_customer_links_id_fk",
+          "tableFrom": "customer_repair_items",
+          "tableTo": "customer_links",
+          "columnsFrom": [
+            "customer_link_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "customer_repair_items_source_kind_check": {
+          "name": "customer_repair_items_source_kind_check",
+          "value": "\"customer_repair_items\".\"source_kind\" IN ('CASE', 'REQUEST')"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

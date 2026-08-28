@@ -7,21 +7,34 @@
     "build": "next build --webpack",
     "start": "next start --port 3200",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:up": "docker compose --env-file .env.local up -d db-dev",
+    "db:down": "docker compose --env-file .env.local down",
+    "db:psql": "docker exec -it dss-home-postgres-dev psql -U dss_home_app -d dss_home_dev",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "link:issue": "node --env-file=.env.local --import tsx scripts/issue-customer-link.ts",
+    "test": "node --import tsx --test src/lib/http/rate-limit.test.ts src/lib/http/client-key.test.ts"
   },
   "dependencies": {
+    "drizzle-orm": "^0.45.2",
     "next": "^16.3.3",
+    "postgres": "^3.4.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "^16.3.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }
