@@ -6,6 +6,8 @@
     "dev": "next dev --webpack --port 3200",
     "build": "next build --webpack",
     "start": "next start --port 3200",
+    "work:start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/start-home-work.ps1",
+    "work:end": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/end-home-work.ps1",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:up": "docker compose --env-file .env.local up -d db-dev",
