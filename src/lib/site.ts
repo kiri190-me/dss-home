@@ -86,53 +86,141 @@ export function trustedProxyHops(): number {
 /**
  * 대메뉴. 기존 사이트의 6개 대분류와 그 하위 항목을 그대로 옮겼다.
  *
- * href가 전부 "#"인 이유: 이번 작업의 범위는 메인 한 장이고 하위 페이지는
- * 아직 없다. 메뉴를 지우지 않고 남겨 둔 것은, 이 사이트가 무엇을 담게 될지
- * 보여주는 것이 지금 단계에서 더 쓸모 있기 때문이다. 페이지를 만들 때
- * 여기 href만 채우면 된다.
+ * ■ 대분류에도 주소를 준다
+ *
+ * 예전에는 href가 전부 "#"이었다. 그래서 대메뉴를 눌러도 아무 데도 가지
+ * 않았고, 대신 눌린 링크에 **포커스가 남았다**. 머리말은 focus-within으로도
+ * 하위 메뉴를 여니까, 그 메뉴는 마우스를 치워도 열린 채로 붙어 있었고 옆
+ * 메뉴에 마우스를 올리면 둘이 겹쳐 보였다. 갈 곳을 주는 것이 그 증상의
+ * 근본 처방이다 — 누르면 화면이 바뀌니 붙어 있을 메뉴 자체가 없다.
+ *
+ * ■ slug가 없는 하위 항목
+ *
+ * 온라인문의·투자정보처럼 하위 항목이 대분류와 같은 이름 하나뿐인 곳이
+ * 있다. 여기에 굳이 /inquiry 와 /inquiry/inquiry 를 둘 다 만들면 같은
+ * 내용의 페이지가 둘이 된다. slug를 비워 두면 그 항목은 대분류 페이지
+ * 자신을 가리킨다.
  */
-export const NAV = [
+export type NavItem = {
+  readonly label: string;
+  /** 없으면 대분류 페이지 자신을 가리킨다. */
+  readonly slug?: string;
+};
+
+export type NavGroup = {
+  readonly label: string;
+  /** 페이지 머리의 영문 표기. 기존 사이트의 소제목을 그대로 쓴다. */
+  readonly en: string;
+  readonly slug: string;
+  readonly items: readonly NavItem[];
+};
+
+export const NAV: readonly NavGroup[] = [
   {
     label: "회사소개",
+    en: "COMPANY INTRODUCTION",
+    slug: "company",
     items: [
-      "대표이사 인사말",
-      "비젼 및 경영이념",
-      "회사연혁",
-      "CI 소개",
-      "조직도",
-      "오시는길",
-      "PARTNERS",
+      { label: "대표이사 인사말", slug: "greeting" },
+      { label: "비젼 및 경영이념", slug: "vision" },
+      { label: "회사연혁", slug: "history" },
+      { label: "CI 소개", slug: "ci" },
+      { label: "조직도", slug: "organization" },
+      { label: "오시는길", slug: "directions" },
+      { label: "PARTNERS", slug: "partners" },
     ],
   },
   {
     label: "제품소개",
-    items: ["RF/DC Power supply", "Cryogenic products", "Vacuum products"],
+    en: "PRODUCTS",
+    slug: "products",
+    items: [
+      { label: "RF/DC Power supply", slug: "rf-dc-power-supply" },
+      { label: "Cryogenic products", slug: "cryogenic" },
+      { label: "Vacuum products", slug: "vacuum" },
+    ],
   },
-  { label: "온라인문의", items: ["온라인문의"] },
-  { label: "투자정보", items: ["투자정보"] },
-  { label: "인재채용", items: ["인재상", "채용공고", "FAQ"] },
-  { label: "고객센터", items: ["공지사항", "자료실"] },
-] as const;
+  {
+    label: "온라인문의",
+    en: "ONLINE INQUIRY",
+    slug: "inquiry",
+    items: [{ label: "온라인문의" }],
+  },
+  {
+    label: "투자정보",
+    en: "INVESTMENT INFORMATION",
+    slug: "investment",
+    items: [{ label: "투자정보" }],
+  },
+  {
+    label: "인재채용",
+    en: "RECRUIT",
+    slug: "recruit",
+    items: [
+      { label: "인재상", slug: "ideal" },
+      { label: "채용공고", slug: "jobs" },
+      { label: "FAQ", slug: "faq" },
+    ],
+  },
+  {
+    label: "고객센터",
+    en: "CUSTOMER CENTER",
+    slug: "support",
+    items: [
+      { label: "공지사항", slug: "notice" },
+      { label: "자료실", slug: "archive" },
+    ],
+  },
+];
 
-/** 메인의 바로가기 넉 장. 문구는 기존 사이트 그대로다. */
+/** 대분류 페이지 주소. */
+export function groupHref(group: NavGroup): string {
+  return `/${group.slug}`;
+}
+
+/** 하위 항목 주소. slug가 없는 항목은 대분류 페이지를 가리킨다. */
+export function itemHref(group: NavGroup, item: NavItem): string {
+  return item.slug ? `/${group.slug}/${item.slug}` : `/${group.slug}`;
+}
+
+/** 주소의 첫 칸으로 대분류를 찾는다. 없으면 undefined — 라우트가 404로 넘긴다. */
+export function findGroup(slug: string): NavGroup | undefined {
+  return NAV.find((group) => group.slug === slug);
+}
+
+/** 대분류 안에서 하위 항목을 찾는다. slug 없는 항목은 주소가 없으니 제외된다. */
+export function findItem(group: NavGroup, slug: string): NavItem | undefined {
+  return group.items.find((item) => item.slug === slug);
+}
+
+/**
+ * 메인의 바로가기 넉 장. 문구는 기존 사이트 그대로다.
+ *
+ * href는 NAV가 만든 실제 주소를 가리킨다 — 넉 장 모두 대메뉴에 있는 곳이라,
+ * 카드만 "#"으로 남겨 두면 같은 자리로 가는 두 길 중 하나만 막힌 꼴이 된다.
+ */
 export const SHORTCUTS = [
   {
     title: "회사소개",
+    href: "/company",
     subtitle: "COMPANY INTRODUCTION",
     lines: ["다양한 노하우를 통하여", "최고의 제품과 최상의", "서비스를 지원합니다."],
   },
   {
     title: "온라인문의",
+    href: "/inquiry",
     subtitle: "ONLINE INQUIRY",
     lines: ["문의사항이 있으시면", "언제든지 문의 주세요!", "친절히 상담해드립니다."],
   },
   {
     title: "투자정보",
+    href: "/investment",
     subtitle: "INVESTMENT INFORMATION",
     lines: ["(주)디에스에스의 투자", "정보를 제공드립니다.", "많은 관심 부탁드립니다."],
   },
   {
     title: "자료실",
+    href: "/support/archive",
     subtitle: "DATA ROOM",
     lines: ["미래를 생각하는 기업", "(주)디에스에스의 제품", "자료를 소개합니다."],
   },
@@ -147,16 +235,19 @@ export const SHORTCUTS = [
 export const PRODUCTS = [
   {
     name: "RF/DC Power supply",
+    href: "/products/rf-dc-power-supply",
     ko: "RF · DC 전원 공급 장치",
     desc: "반도체·디스플레이 공정 장비에 쓰이는 고주파 및 직류 전원 공급 장치입니다.",
   },
   {
     name: "Cryogenic products",
+    href: "/products/cryogenic",
     ko: "극저온 장비",
     desc: "극저온 환경을 만들고 유지하는 장비와 그 주변 부품을 다룹니다.",
   },
   {
     name: "Vacuum products",
+    href: "/products/vacuum",
     ko: "진공 장비",
     desc: "진공 환경 조성에 필요한 펌프와 계측·배관 부품을 공급합니다.",
   },

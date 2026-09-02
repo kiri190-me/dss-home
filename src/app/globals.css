@@ -49,3 +49,25 @@ body {
   /* 모바일 가로 스크롤을 막는다 — 배너의 넓은 도형이 넘칠 수 있다. */
   overflow-x: hidden;
 }
+
+/*
+ * 좁은 화면 메뉴가 펼쳐질 때 한 번 흐르는 움직임.
+ *
+ * 넓은 화면의 하위 메뉴는 transition으로 여닫는다(SiteHeader의 DROPDOWN).
+ * 그런데 <details>는 닫히는 순간 내용을 DOM에서 없애 버려서 닫힘에는
+ * transition이 걸리지 않는다. 열릴 때만 도는 keyframes가 이 자리에 맞다.
+ *
+ * prefers-reduced-motion은 화면 쪽에서 motion-reduce:animate-none으로
+ * 끈다 — 움직임을 줄여 달라는 설정은 취향이 아니라 어지럼증·전정기관
+ * 문제인 경우가 있다.
+ */
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.5rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}

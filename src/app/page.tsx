@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { COMPANY, PRODUCTS, SHORTCUTS } from "@/lib/site";
@@ -120,9 +121,9 @@ export default function HomePage() {
         <section className="mx-auto max-w-6xl px-5 py-16 md:py-20">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {SHORTCUTS.map((card) => (
-              <a
+              <Link
                 key={card.title}
-                href="#"
+                href={card.href}
                 className="group flex flex-col border border-zinc-200 bg-white p-7 transition-all hover:-translate-y-1 hover:border-dss-accent hover:shadow-lg"
               >
                 <h2 className="text-lg font-bold text-zinc-900">{card.title}</h2>
@@ -142,7 +143,7 @@ export default function HomePage() {
                 >
                   →
                 </span>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -162,9 +163,9 @@ export default function HomePage() {
 
             <div className="mt-12 grid gap-6 md:grid-cols-3">
               {PRODUCTS.map((product) => (
-                <a
+                <Link
                   key={product.name}
-                  href="#"
+                  href={product.href}
                   className="group border border-zinc-200 bg-white p-8 transition-all hover:border-dss-blue hover:shadow-lg"
                 >
                   <h3 className="text-lg font-bold text-zinc-900 transition-colors group-hover:text-dss-blue">
@@ -174,7 +175,7 @@ export default function HomePage() {
                   <p className="mt-5 text-sm leading-relaxed text-zinc-600">
                     {product.desc}
                   </p>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -191,9 +192,12 @@ export default function HomePage() {
                     NOTICE
                   </span>
                 </h2>
-                <a href="#" className="text-sm text-zinc-400 hover:text-dss-accent">
+                <Link
+                  href="/support/notice"
+                  className="text-sm text-zinc-400 hover:text-dss-accent"
+                >
                   + 더보기
-                </a>
+                </Link>
               </div>
               {/*
                 원본도 이 자리가 비어 있다("게시물이 없습니다"). 없는 글을

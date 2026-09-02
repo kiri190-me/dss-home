@@ -1,20 +1,38 @@
 import Link from "next/link";
 import DssLogo from "./DssLogo";
-import { NAV, portalUrl } from "@/lib/site";
+import { NAV, groupHref, itemHref, portalUrl } from "@/lib/site";
 
 /**
  * 머리말 — 로고, 대메뉴, 그리고 오른쪽 끝의 '사내 시스템'.
  *
  * ■ 자바스크립트를 쓰지 않는다
  *
- * 펼침 메뉴는 group-hover와 focus-within으로, 모바일 메뉴는 <details>로
+ * 펼침 메뉴는 group-hover와 :focus-visible로, 모바일 메뉴는 <details>로
  * 만들었다. 회사 소개 사이트의 머리말은 동작이 뻔한 부품이라, 이것 때문에
  * 클라이언트 번들을 만들 이유가 없다. 부수 효과로 자바스크립트가 늦게
  * 뜨거나 실패해도 메뉴가 동작한다.
  *
- * focus-within을 함께 거는 이유: hover만 걸면 마우스 없이 Tab으로 넘기는
- * 사람에게 하위 메뉴가 영영 열리지 않는다.
+ * ■ focus-within이 아니라 has-[:focus-visible]인 이유
+ *
+ * 전에는 focus-within으로 열었다. 그런데 **마우스 클릭도 포커스를 준다** —
+ * 대메뉴를 한 번 누르면 그 메뉴에 포커스가 남아 하위 메뉴가 열린 채로
+ * 붙어 있었고, 그 상태에서 옆 메뉴에 마우스를 올리면 둘이 겹쳐 보였다.
+ *
+ * :focus-visible은 브라우저가 "키보드로 온 포커스"라고 판단할 때만 잡힌다.
+ * 그래서 Tab으로 넘기는 사람에게는 그대로 열리고, 마우스로 누른 사람에게는
+ * 남지 않는다. 애초에 이제 대메뉴는 눌리면 해당 페이지로 넘어가므로,
+ * 눌린 자리에 메뉴가 남아 있을 이유가 없다.
  */
+
+/** 하위 메뉴 펼침·닫힘. hover와 키보드 포커스에서 같은 모양이 나오도록 한 곳에 모았다. */
+const DROPDOWN =
+  "invisible absolute left-1/2 top-full -translate-x-1/2 -translate-y-2 " +
+  "min-w-48 border border-zinc-200 bg-white py-2 text-center opacity-0 shadow-lg " +
+  "transition-[opacity,translate,visibility] duration-200 ease-out motion-reduce:transition-none " +
+  "group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 " +
+  "group-has-[:focus-visible]:visible group-has-[:focus-visible]:translate-y-0 " +
+  "group-has-[:focus-visible]:opacity-100";
+
 export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur">
@@ -40,23 +58,23 @@ export default function SiteHeader() {
         <nav className="ml-auto hidden lg:block" aria-label="주메뉴">
           <ul className="flex items-center">
             {NAV.map((group) => (
-              <li key={group.label} className="group relative">
-                <a
-                  href="#"
-                  className="block px-4 py-7 text-[15px] font-semibold text-zinc-700 transition-colors hover:text-dss-accent group-focus-within:text-dss-accent"
+              <li key={group.slug} className="group relative">
+                <Link
+                  href={groupHref(group)}
+                  className="block px-4 py-7 text-[15px] font-semibold text-zinc-700 transition-colors hover:text-dss-accent focus-visible:text-dss-accent group-hover:text-dss-accent"
                 >
                   {group.label}
-                </a>
-                <div className="invisible absolute left-0 top-full min-w-48 border border-zinc-200 bg-white py-2 opacity-0 shadow-lg transition-[opacity,visibility] group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                </Link>
+                <div className={DROPDOWN}>
                   <ul>
                     {group.items.map((item) => (
-                      <li key={item}>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm whitespace-nowrap text-zinc-600 hover:bg-zinc-50 hover:text-dss-accent"
+                      <li key={item.label}>
+                        <Link
+                          href={itemHref(group, item)}
+                          className="block px-6 py-2 text-sm whitespace-nowrap text-zinc-600 hover:bg-zinc-50 hover:text-dss-accent focus-visible:bg-zinc-50 focus-visible:text-dss-accent"
                         >
-                          {item}
-                        </a>
+                          {item.label}
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -117,21 +135,29 @@ export default function SiteHeader() {
               <path d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </summary>
-          <div className="absolute right-0 top-full mt-2 max-h-[70vh] w-64 overflow-y-auto rounded-lg border border-zinc-200 bg-white py-2 shadow-xl">
+          {/*
+            펼칠 때만 한 번 흐르는 애니메이션이라 transition이 아니라
+            keyframes를 쓴다(globals.css의 dropdown-in). <details>는 닫힐 때
+            내용을 바로 없애 버려서, 닫힘은 어차피 애니메이션할 수 없다.
+          */}
+          <div className="absolute right-0 top-full mt-2 max-h-[70vh] w-64 origin-top animate-[dropdown-in_200ms_ease-out] overflow-y-auto rounded-lg border border-zinc-200 bg-white py-2 shadow-xl motion-reduce:animate-none">
             {NAV.map((group) => (
-              <div key={group.label} className="px-2 py-1.5">
-                <p className="px-2 py-1 text-sm font-bold text-zinc-900">
+              <div key={group.slug} className="px-2 py-1.5">
+                <Link
+                  href={groupHref(group)}
+                  className="block rounded px-2 py-1 text-sm font-bold text-zinc-900 hover:bg-zinc-50 hover:text-dss-accent"
+                >
                   {group.label}
-                </p>
+                </Link>
                 <ul>
                   {group.items.map((item) => (
-                    <li key={item}>
-                      <a
-                        href="#"
+                    <li key={item.label}>
+                      <Link
+                        href={itemHref(group, item)}
                         className="block rounded px-2 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50"
                       >
-                        {item}
-                      </a>
+                        {item.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
