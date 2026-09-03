@@ -1,3 +1,12 @@
+import {
+  isAutoValue,
+  primaryLanAddress,
+  resolveAutoUrl,
+} from "./lan-address";
+
+/** 포털(dss-auth)의 포트. */
+const PORTAL_PORT = 3100;
+
 /**
  * 회사 정보와 메뉴 — 화면이 아니라 여기 한 곳에 둔다.
  *
@@ -7,6 +16,13 @@
  * 한 곳에서만 고칠 수 있게 해 두지 않으면 반드시 어긋난다.
  */
 
+/**
+ * ⚠️ 이 파일은 lan-address 를 통해 node:os 를 끌어온다. 따라서 지금은
+ * **서버에서만** 불러올 수 있다(현재 쓰는 곳은 전부 서버 컴포넌트다).
+ * 클라이언트 컴포넌트에서 COMPANY 를 쓰고 싶어지면, 그 상수만 별도
+ * 파일로 옮겨라 — 여기서 바로 가져가면 node:os 를 못 찾는다는 빌드 오류가
+ * 난다. 원인이 회사 정보와 아무 상관이 없어 헤매기 쉽다.
+ */
 export const COMPANY = {
   nameKo: "(주)디에스에스",
   nameEn: "DSS Co., Ltd.",
@@ -33,7 +49,12 @@ export const COMPANY = {
  * 빌드하지 않고 환경변수만 바꿔도 반영된다.
  */
 export function portalUrl(): string {
-  return process.env.PORTAL_URL ?? "http://localhost:3100";
+  const configured = process.env.PORTAL_URL ?? "http://localhost:3100";
+  // auto 면 이 기계의 사내망 주소로 푼다. 개발 PC 는 Wi-Fi 를 옮길 때마다
+  // 주소가 바뀌는데, 그때마다 여기를 고치게 두면 언젠가 빠뜨린다.
+  return isAutoValue(configured)
+    ? resolveAutoUrl(configured, PORTAL_PORT, primaryLanAddress())
+    : configured;
 }
 
 /**
